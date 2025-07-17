@@ -1,26 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF‑8">
-  <meta name="viewport" content="width=device‑width, initial-scale=1.0">
-  <title>BMTC Bus Buddy</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BMTC Bus Checker</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>BMTC Bus Buddy 🚌</h1>
-    <p>Find if your bus takes you to your stop</p>
-  </header>
-
   <div class="container">
-    <input id="destination" type="text" placeholder="Enter Destination (e.g. Majestic)" />
-    <input id="busNumber" type="text" placeholder="Enter Bus Number (e.g. 201G)" />
-    <button onclick="checkBus()">Check My Bus ➜</button>
-    <div id="result" class="result"></div>
+    <h1>🚍 Namma BMTC Bus Checker</h1>
+    <p class="subtitle">Find out if the bus takes you to your destination!</p>
+
+    <div class="file-inputs">
+      <label>Upload <code>routes.txt</code>:
+        <input type="file" id="routesFile" accept=".txt" />
+      </label>
+      <label>Upload <code>stops.txt</code>:
+        <input type="file" id="stopsFile" accept=".txt" />
+      </label>
+    </div>
+
+    <div class="form-group">
+      <input type="text" id="destinationInput" placeholder="Enter destination stop name (e.g. Majestic)" />
+      <input type="text" id="busNumberInput" placeholder="Enter bus number (e.g. 335E)" />
+      <button onclick="checkBus()">Check</button>
+    </div>
+
+    <div id="result"></div>
   </div>
 
-  <footer>Made with ❤️ for Namma Bengaluru</footer>
+  <script>
+    let routesData = [];
+    let stopsData = [];
 
-  <script src="script.js"></script>
+    document.getElementById('routesFile').addEventListener('change', function (e) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        const lines = reader.result.split('\n').slice(1);
+        routesData = lines.map(line => {
+          const parts = line.split(',');
+          return { route_id: parts[0], short_name: parts[2], long_name: parts[3] };
+        });
+      };
+      reader.readAsText(e.target.files[0]);
+    });
+
+    document.getElementById('stopsFile').addEventListener('change', function (e) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        const lines = reader.result.split('\n').slice(1);
+        stopsData = lines.map(line => {
+          const parts = line.split(',');
+          return { stop_id: parts[0], stop_name: parts[2]?.toLowerCase().trim() };
+        });
+      };
+      reader.readAsText(e.target.files[0]);
+    });
+
+    function checkBus() {
+      const busNum = document.getElementById('busNumberInput').value.trim().toUpperCase();
+      const dest = document.getElementById('destinationInput').value.trim().toLowerCase();
+      const resultBox = document.getElementById('result');
+
+      if (!routesData.length || !stopsData.length) {
+        resultBox.innerHTML = "<span class='error'>Please upload both routes.txt and stops.txt</span>";
+        return;
+      }
+
+      const routeFound = routesData.find(r => r.short_name.toUpperCase() === busNum);
+      const stopFound = stopsData.find(s => s.stop_name.includes(dest));
+
+      if (routeFound && stopFound) {
+        resultBox.innerHTML = `<span class='success'>✅ Yes! Bus <strong>${busNum}</strong> can take you to <strong>${dest}</strong>.</span>`;
+      } else {
+        resultBox.innerHTML = `<span class='error'>❌ No matching bus or destination found. Try again!</span>`;
+      }
+    }
+  </script>
 </body>
 </html>
