@@ -1,1 +1,14 @@
-
+[
+  {
+    "busNumber": "201G",
+    "stops": ["Banashankari", "Jayanagar", "Majestic", "Shivajinagar"]
+  },
+  {
+    "busNumber": "500D",
+    "stops": ["Hebbal", "KR Puram", "Indiranagar"]
+  },
+  {
+    "busNumber": "374C",
+    "stops": ["Majestic", "Koramangala", "Electronic City"]
+  }
+]
