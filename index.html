@@ -4,77 +4,127 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BMTC Bus Checker</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #e0f7fa, #fff);
+      color: #333;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    .container {
+      max-width: 500px;
+      margin: 3rem auto;
+      padding: 2rem;
+      background-color: #f9f9f9;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #00796b;
+    }
+    .subtitle {
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+    input[type="text"] {
+      width: 100%;
+      font-size: 1.1rem;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      padding: 0.8rem 1.2rem;
+      background-color: #00796b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #004d40;
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #777;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>🚍 Namma BMTC Bus Checker</h1>
-    <p class="subtitle">Find out if the bus takes you to your destination!</p>
+    <p class="subtitle">Find out if your bus goes to your destination in Bengaluru!</p>
 
-    <div class="file-inputs">
-      <label>Upload <code>routes.txt</code>:
-        <input type="file" id="routesFile" accept=".txt" />
-      </label>
-      <label>Upload <code>stops.txt</code>:
-        <input type="file" id="stopsFile" accept=".txt" />
-      </label>
-    </div>
-
-    <div class="form-group">
-      <input type="text" id="destinationInput" placeholder="Enter destination stop name (e.g. Majestic)" />
-      <input type="text" id="busNumberInput" placeholder="Enter bus number (e.g. 335E)" />
-      <button onclick="checkBus()">Check</button>
-    </div>
+    <input type="text" id="destinationInput" placeholder="Enter destination (e.g. Majestic)" />
+    <input type="text" id="busNumberInput" placeholder="Enter bus number (e.g. 335E)" />
+    <button onclick="checkBus()">Check</button>
 
     <div id="result"></div>
+
+    <div class="footer">Made with ❤️ for Bengaluru commuters</div>
   </div>
 
   <script>
-    let routesData = [];
-    let stopsData = [];
+    const routes = [
+      { short_name: "335E", long_name: "Majestic - ITPL" },
+      { short_name: "500D", long_name: "Banashankari - Hebbal" },
+      { short_name: "KBS-2", long_name: "Kempegowda Bus Station - Electronic City" },
+      { short_name: "365", long_name: "Majestic - Bannerghatta" },
+      { short_name: "201", long_name: "Banashankari - Yeshwantpur" },
+      { short_name: "V-335E", long_name: "Vajra ITPL - Majestic" }
+    ];
 
-    document.getElementById('routesFile').addEventListener('change', function (e) {
-      const reader = new FileReader();
-      reader.onload = function () {
-        const lines = reader.result.split('\n').slice(1);
-        routesData = lines.map(line => {
-          const parts = line.split(',');
-          return { route_id: parts[0], short_name: parts[2], long_name: parts[3] };
-        });
-      };
-      reader.readAsText(e.target.files[0]);
-    });
-
-    document.getElementById('stopsFile').addEventListener('change', function (e) {
-      const reader = new FileReader();
-      reader.onload = function () {
-        const lines = reader.result.split('\n').slice(1);
-        stopsData = lines.map(line => {
-          const parts = line.split(',');
-          return { stop_id: parts[0], stop_name: parts[2]?.toLowerCase().trim() };
-        });
-      };
-      reader.readAsText(e.target.files[0]);
-    });
+    let destinationLocked = false;
+    let destination = "";
 
     function checkBus() {
-      const busNum = document.getElementById('busNumberInput').value.trim().toUpperCase();
-      const dest = document.getElementById('destinationInput').value.trim().toLowerCase();
+      const destInput = document.getElementById('destinationInput');
+      const busInput = document.getElementById('busNumberInput');
       const resultBox = document.getElementById('result');
 
-      if (!routesData.length || !stopsData.length) {
-        resultBox.innerHTML = "<span class='error'>Please upload both routes.txt and stops.txt</span>";
+      if (!destinationLocked) {
+        destination = destInput.value.trim().toLowerCase();
+        if (!destination) {
+          resultBox.innerHTML = "<div class='error'>Please enter a destination</div>";
+          return;
+        }
+        destInput.disabled = true;
+        destinationLocked = true;
+      }
+
+      const busNum = busInput.value.trim().toUpperCase();
+      if (!busNum) {
+        resultBox.innerHTML = "<div class='error'>Enter a bus number to check</div>";
         return;
       }
 
-      const routeFound = routesData.find(r => r.short_name.toUpperCase() === busNum);
-      const stopFound = stopsData.find(s => s.stop_name.includes(dest));
+      const match = routes.find(r =>
+        r.short_name.toUpperCase() === busNum &&
+        r.long_name.toLowerCase().includes(destination)
+      );
 
-      if (routeFound && stopFound) {
-        resultBox.innerHTML = `<span class='success'>✅ Yes! Bus <strong>${busNum}</strong> can take you to <strong>${dest}</strong>.</span>`;
+      if (match) {
+        resultBox.innerHTML = `<div class="success">✅ Yes! Bus <strong>${busNum}</strong> goes to <strong>${destination}</strong>.</div>`;
       } else {
-        resultBox.innerHTML = `<span class='error'>❌ No matching bus or destination found. Try again!</span>`;
+        resultBox.innerHTML = `<div class="error">❌ No, Bus <strong>${busNum}</strong> doesn't go to <strong>${destination}</strong>.</div>`;
       }
+
+      busInput.value = ""; // reset for next try
     }
   </script>
 </body>
