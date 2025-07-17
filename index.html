@@ -7,8 +7,8 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom, #e0f7fa, #fff);
-      color: #333;
+      background-color: #ffffff;
+      color: #222;
       margin: 0;
       padding: 0;
       text-align: center;
@@ -17,28 +17,34 @@
       max-width: 500px;
       margin: 3rem auto;
       padding: 2rem;
-      background-color: #f9f9f9;
+      background-color: #e3f2fd; /* Light BMTC Blue */
       border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     h1 {
-      color: #00796b;
+      color: #0d47a1; /* Deep Blue */
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
     }
     .subtitle {
       font-size: 1.1rem;
+      color: #333;
       margin-bottom: 1.5rem;
     }
     input[type="text"] {
-      width: 100%;
-      font-size: 1.1rem;
-      padding: 0.8rem;
+      width: 90%;
+      font-size: 1.2rem;
+      padding: 1rem;
       margin-bottom: 1rem;
-      border: 1px solid #ccc;
+      border: 1px solid #bbb;
       border-radius: 8px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
     button {
       padding: 0.8rem 1.2rem;
-      background-color: #00796b;
+      background-color: #0d47a1;
       color: white;
       border: none;
       border-radius: 8px;
@@ -46,7 +52,7 @@
       cursor: pointer;
     }
     button:hover {
-      background-color: #004d40;
+      background-color: #08306b;
     }
     .success {
       color: green;
@@ -61,14 +67,14 @@
     .footer {
       margin-top: 2rem;
       font-size: 0.9rem;
-      color: #777;
+      color: #555;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>🚍 Namma BMTC Bus Checker</h1>
-    <p class="subtitle">Will this bus take me home?!</p>
+    <p class="subtitle">Will this bus take me home?</p>
 
     <input type="text" id="destinationInput" placeholder="Enter destination (e.g. Majestic)" />
     <input type="text" id="busNumberInput" placeholder="Enter bus number (e.g. 335E)" />
@@ -76,7 +82,7 @@
 
     <div id="result"></div>
 
-    <div class="footer">Made with ❤️ for Bengaluru commuters</div>
+    <div class="footer">Made with ❤️ for Bengaluru commuters | BMTC Support Tool</div>
   </div>
 
   <script>
